@@ -7901,7 +7901,7 @@ void gunDrawSight(Gfx **gdl) {
             {   /* HUD Scale: the sight shrinks about the aim point */
                 Gfx *agdl = (Gfx *) sp54;
                 agdl = portHudScaleBegin(agdl, xypos[0], xypos[1]);
-                sp54 = (s32) agdl;
+                sp54 = (intptr_t) agdl;
             }
             /* CROSSHAIR COLOUR: bondwalk2.c owns the tint-or-vanilla
              * decision for every crosshair sprite in the game. */
@@ -7916,7 +7916,7 @@ void gunDrawSight(Gfx **gdl) {
             {
                 Gfx *agdl = (Gfx *) sp54;
                 agdl = portHudScaleEnd(agdl);
-                sp54 = (s32) agdl;
+                sp54 = (intptr_t) agdl;
             }
             if (reachx > 1.001f)
             {
