@@ -23,6 +23,20 @@ The native build reads assets from the ROM at runtime. It does not need extracti
 
 Use the US ROM with SHA-1 `abe01e4aeb033b6c0836819f549c791b26cfde83`. Alternatively, put the image in `build_macos/Data/` following [the Data folder instructions](../tools/Data_README.txt). Settings, saves and support files are stored beside the executable, independently of the shell's working directory. Keep that directory writable and retain the support files copied there by CMake.
 
+## Release zip
+
+The `package-macos` CI job builds one universal (arm64 + x86_64) binary for macOS 11 and newer and uploads `ProjectMidas-<name>-macos.zip`. It links SDL2 2.30.11 built from source and bundles it beside the executable. Homebrew's `sdl2` is sdl2-compat, which loads SDL3 at runtime, so `scripts/port/package_macos.sh` refuses a build linked against it. To package locally, build SDL2 as that job does, then:
+
+```sh
+cmake -S . -B build_release -G Ninja -DCMAKE_BUILD_TYPE=Release -DGE_VIDEO=ON \
+  -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+  -DCMAKE_PREFIX_PATH="$HOME/sdl2-macos"
+cmake --build build_release --parallel
+scripts/port/package_macos.sh build_release v1.0.3
+```
+
+The zip is ad-hoc signed, not notarized. Its README tells players how to clear the quarantine flag if macOS refuses to open it.
+
 ## Implementation
 
 Serialized ROM offsets and display-list words remain 32-bit inputs. Model nodes, textures, setup records, room/portal tables, animation headers and audio banks are converted to native layouts at their load boundaries. Host addresses use pointer types or `intptr_t`/`uintptr_t`; vertex records retain their serialized 16-byte layout. Native model allocations are released when the stage pool resets.
